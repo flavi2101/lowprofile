@@ -1,0 +1,26 @@
+{
+  "menu_blog": "Blog",
+  "menu_tag": "Tags",
+  "menu_projects": "Projetos",
+  "menu_about": "Sobre",
+  "desc_projects": "Aprendendo divertindo",
+  "desc_about": "Conheça mais sobre mim",
+  "home_title": "Low Profile",
+  "home_desc": "Tecnolgia, hacker, engenharia reversa e outas coisas",
+  "label_read_more": "Leia mais",
+  "blog_title": "Todos Postagens",
+  "btn_prev": "Anterior",
+  "btn_next": "Proximo",
+  "label_learn_more": "Leia mais",
+
+  "footer": {
+    "desc": "Criado Flávio",
+    "view_source": "Código fonte"
+  },
+  "oc_title": "自设",
+
+  "Latest": "动态",
+  "All Posts": "所有文章",
+  "img_overlay_hint": "长按拖动。滚动缩放。",
+  "img_overlay_hint_mobile": "长按拖动。双指缩放。"
+}
