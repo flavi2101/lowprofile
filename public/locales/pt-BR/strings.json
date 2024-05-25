@@ -21,7 +21,7 @@
   "publish":"Publicado em",
 
   "footer": {
-    "desc": "Criado Flávio",
+    "desc": "Criado utilizando Nest Js e Tailwind",
     "view_source": "Código fonte"
   },
   "oc_title": "自设",
