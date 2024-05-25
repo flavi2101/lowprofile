@@ -1,9 +1,7 @@
 'use client'
 import { useMediaQuery } from 'react-responsive'
-import SpotifyPlayerBox from './SpotifyPlayerBox'
 import GithubActivityBox from './GithubActivityBox'
-import ScrollTextBox from './ScrollTextBox'
-import GalleryPreviewBox from './GalleryPreviewBox'
+
 
 export default function ResponsiveBox() {
   const isXs = useMediaQuery({ query: '(max-width: 480px)' })
@@ -22,17 +20,13 @@ export default function ResponsiveBox() {
   }
 
   return (
-    <section className={`mt-3 flex justify-between ${getLayout(flex_col, flex_row, flex_row)}`}>
+    <section className={`mt-3 flex h-[200px] justify-between ${getLayout(flex_col, flex_row, flex_row)}`}>
       <div
         className={`flex flex-grow justify-between ${getLayout(flex_col, flex_col, flex_row)} min-w-[75%]`}
-      >
-        <div className={`flex ${getLayout(flex_row, flex_row, flex_col)} min-w-[45%]`}>
-          <SpotifyPlayerBox />
-          <ScrollTextBox />
-        </div>
+      >      
         <GithubActivityBox />
       </div>
-      <GalleryPreviewBox />
+      
     </section>
   )
 }

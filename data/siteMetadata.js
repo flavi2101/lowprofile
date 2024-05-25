@@ -7,10 +7,10 @@ const siteMetadata = {
   language: 'pt-br',
   theme: 'system', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
-  siteRepo: 'https://github.com/AmosChenZixuan/amoschenzixuan.github.io',
+  siteRepo: 'https://github.com/flavi2101/lowprofile',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/avatar.png',
-  mastodon: 'https://mastodon.social/@mastodonuser',
+  //mastodon: 'https://mastodon.social/@mastodonuser',
   email: 'zixuanchen1999@gmail.com',
   github: 'https://github.com/amoschenzixuan',
   linkedin: 'https://www.linkedin.com/in/amoschenzixuan/',
@@ -20,7 +20,7 @@ const siteMetadata = {
   // youtube: 'https://youtube.com',
   // threads: 'https://www.threads.net',
   // instagram: 'https://www.instagram.com',
-  locale: 'en-US',
+  locale: 'pt-BR',
   analytics: {
     // If you want to use an analytics provider you have to add it to the
     // content security policy in the `next.config.js` file.

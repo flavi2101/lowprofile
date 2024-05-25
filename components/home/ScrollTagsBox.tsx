@@ -26,8 +26,8 @@ export default function ScrollTagsBox() {
             <Tag
               key={j}
               text={tag}
-              className="mx-6 text-3xl text-white
-              hover:text-primary-300 dark:text-gray-900 dark:hover:text-primary-400 xl:text-7xl"
+              className="mx-5 text-3xl
+              hover:text-primary-300 dark:text-white-900 dark:hover:text-primary-400 xl:text-7xl"
             />
           ))}
         </ParallaxText>
@@ -45,7 +45,7 @@ export default function ScrollTagsBox() {
 
   return (
     <section
-      className="card bg-blue-pink mt-5 space-y-2 overflow-hidden pb-1
+      className="mt-5 space-y-2 overflow-hidden pb-1
             font-orbitron"
     >
       {createParallaxTexts()}

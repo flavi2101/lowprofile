@@ -4,12 +4,12 @@ import ActivityCalendar, { ThemeInput, Activity } from 'react-activity-calendar'
 import Spinner from '@/components/Spinner'
 
 const minimalTheme: ThemeInput = {
-  light: ['#eee6ff', '#884dff'],
-  dark: ['#313244', '#cba6f7'],
+  light: ['grey', 'green'],
+  dark: ['grey', 'green'],
 }
 
-const DAYS = 98
-const USERNAME = 'amoschenzixuan'
+const DAYS = 150
+const USERNAME = 'flavi2101'
 
 function selectLastNDays(contributions: Array<Activity>): Array<Activity> {
   return contributions.slice(-DAYS)
