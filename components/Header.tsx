@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import siteMetadata from '@/data/siteMetadata'
 import useHeaderNavLinks from '@/data/headerNavLinks'
-import Image from 'next/image'
-import Link from './Link'
+import SearchBox from '@/components/home/SearchBox'
 import MobileNav from './mobile-nav/MobileNav'
 import MobileNavToggle from './mobile-nav/MobileNavToggle'
 import ThemeSwitch from './ThemeSwitch'
+import Link from 'next/link'
 
 import LocaleSwitch from './LocaleSwitch'
 import { useTranslation } from 'utils/locale'
@@ -95,9 +95,6 @@ const Header = () => {
                   Low Profile
                 </h1>
               </div>
-              <div className="mr-3 block md:hidden">
-                <Image src="/static/favicons/icon.png" width="44" height="44" alt="logo" priority />
-              </div>
               {typeof siteMetadata.headerTitle === 'string' ? (
                 <div className="hidden h-6 text-2xl font-semibold sm:block">
                   {siteMetadata.headerTitle}
@@ -122,6 +119,7 @@ const Header = () => {
                 </Link>
               ))}
             <ThemeSwitch />
+            <SearchBox />
             <LocaleSwitch />
             <MobileNavToggle onToggleNav={onToggleNav} />
           </div>
