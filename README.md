@@ -5,32 +5,12 @@
 
 ---
 
-![banner](public/static/images/banner.png)
+# Flávio Personal Blog
 
-# AmosChenZixuan Personal Blog
-
-Based off the [**Tailwind Nextjs Starter Blog**](https://github.com/timlrx/tailwind-nextjs-starter-blog)
+Based off the [**Tailwind Nextjs Starter Blog**](https://github.com/timlrx/tailwind-nextjs-starter-blog) and [**Amos´s personal blog**](https://github.com/AmosChenZixuan/Azurtelier.com)
 
 This is a [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/) project which is based on Next App directory with [React Server Component](https://nextjs.org/docs/getting-started/react-essentials#server-components) and uses [Contentlayer](https://www.contentlayer.dev/) to manage markdown content.
 
-## Addtional Features by Me
-
-- Internationalization
-  - Supports English and Chinese.
-- Customized Font
-- Smart Nav Bar
-  - Hides itself and reappears by scrolling
-- Parallax Scrolling Tags
-- Spotify Status
-  - Displays currently playing song
-  - If no song is playing, displays the last played song
-- Image Viewer
-  - Supports dragging and zooming
-- Photo Gallery (Work in Progress)
-  - Responsive and compact grid of images
-  - Supports sharing and external links
-- Resume (To-Do)
-  - Timeline with cool scrolling animations
 
 ## Original Features From the Template
 
@@ -60,6 +40,14 @@ This is a [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com
 - Projects page
 - Preconfigured security headers
 - SEO friendly with RSS feed, sitemaps and more!
+- Internationalization
+- Customized Font
+- Smart Nav Bar
+  - Hides itself and reappears by scrolling
+- Parallax Scrolling Tags
+
+
+
 
 ## Installation
 
