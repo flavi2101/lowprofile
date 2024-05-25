@@ -12,6 +12,13 @@
   "btn_prev": "Anterior",
   "btn_next": "Proximo",
   "label_learn_more": "Leia mais",
+  "back-blogs": "Voltar para blogs",
+  "next-article":"Próximo artigo",
+  "previous-article":"Artigo anterior",
+  "view-on-git":"Visualizar no GitHub",
+  "name":"Nome",
+  "author": "Autor",
+  "publish":"Publicado em",
 
   "footer": {
     "desc": "Criado Flávio",

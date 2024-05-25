@@ -3,7 +3,7 @@ import 'css/fonts.css'
 import 'css/colors.css'
 import 'pliny/search/algolia.css'
 
-import { Pangolin, ZCOOL_KuaiLe, Orbitron } from 'next/font/google'
+import { Pangolin,  Orbitron } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -24,13 +24,6 @@ const pangolin = Pangolin({
   weight: '400',
 })
 
-// default Chinese text
-const zcool_kuaile = ZCOOL_KuaiLe({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-zcool-kuaile',
-  weight: '400',
-})
 
 // logo Font
 const orbitron = Orbitron({

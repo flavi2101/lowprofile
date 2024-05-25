@@ -12,6 +12,13 @@
   "btn_prev": "Previous",
   "btn_next": "Next",
   "label_learn_more": "Learn more",
+  "back-blogs": "back to blogs",
+  "next-article":"Next article",
+  "previous-article":"Previous article",
+  "view-on-git":"View on GitHub",
+  "name":"Name",
+  "author": "Authors",
+  "publish":"Publised on",
 
   "footer": {
     "desc": "Made with 🤍 using Nextjs and Tailwind",
