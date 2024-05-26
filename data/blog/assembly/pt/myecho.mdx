@@ -5,20 +5,21 @@ tags: ['assembly', 'syscall', 'interrupts']
 draft: false
 summary: Como implementar o programa echo em assembly x86
 language: pt
+bibliography:
+  - 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
 ---
 
 
-# Meu "echo" em assembly!
+Meu "echo" em assembly!
 
 Continuando na jornada de aprender assembly como fundamento para aprendizados futuros,
 compartilho com vocês o meu processo para desenvolver um o echo programa do linux em asssembly.
 Isso não é completamente uma verdade, ja que o original o texto que será exibido na tela e passado como argumento do programa,
 o que acredito não mudar muita coisa, e com certeza faremos um futuro proximo. 
 
-**Index** \
-[INTRODUÇÃO](#introducao)
 
-<a id="introducao"></a>
+<TOCInline toc={props.toc} asDisclosure toHeading={4} />
+
 # Introdução
 
 Para partimos todos do mesmo ponto, vamos entender o que programa echo faz.
@@ -85,7 +86,7 @@ Iremos usar três ferramentas, duas para gerar o binário e uma para debugar (Li
 #### Pseudo Instruções
 Acredito já ter citado, mas para reforçar, essa versão do código não aceita o input como parâmetro, primeiro iremos executar o programa, que irá deixar o terminal em modo de "escuta" para que possamos inserir a string.  Outro ponto importante é que esse codigo teve como base o exércicio proposto no livro programmingGroundUp.
 
-Em nosso codigo assembly, precisamos passar algumas diretivas para o assembler para ele saber que tipo de informação estamos escrevendo em determinadas areas do nosso codigo, isso são chamado pseudo-operantes, são palavras chaves no nosso codigo que não são interpretadas como instruções, mas sim uma marcação para dizer o assembler o que o codigo dentro daquela sessão se refere. E por falar em sessão, esse é uma diretiva (sinonimo de pseudo-operantes) que divide o codigo em, sessão de dados, onde variaveis globais são escritas e o assembler sabera que precisará reservar memoria para essas informações.
+Em nosso codigo assembly, precisamos passar algumas diretivas para o assembler para ele saber que tipo de informação estamos escrevendo em determinadas areas do nosso codigo, isso são chamado pseudo-operantes[@IBM], são palavras chaves no nosso codigo que não são interpretadas como instruções, mas sim uma marcação para dizer o assembler o que o codigo dentro daquela sessão se refere. E por falar em sessão, esse é uma diretiva (sinonimo de pseudo-operantes) que divide o codigo em, sessão de dados, onde variaveis globais são escritas e o assembler sabera que precisará reservar memoria para essas informações.
 
 `.section .data` 
 
@@ -190,11 +191,11 @@ Pronto, nesse arquivo encontramos as configurações do sistema operacional que 
 
 ##### Arquivos de descrição
 
-Para contextualizar, podemos dizer que arquivos de descrição são estruturas de dados armazenadas no kernel para cada arquivo que estão em uso por algum processo, seja para ler, escrever ou ambos, e elas possui um campo que guarda um valor numérico que representa esse arquivo que nos é retornado pelo sistema operacional quando fazemos uma chamada de sistema para alguma dessas operações. Porém existem três desses estruturas de dados que não estão relacionadas diretamente a arquivos, mas sim com o sistema de entrada e saída de dados, chamadas de I/O streams. Quando executamos programas no terminal do linux, e usamos redirecionadores ou pipes estão lidando ou deixando de lidar com esses arquivos de descrição. Conhecidos como stdin, stdout e stderror, esse são arquivos de descrição $padrão^{1}$ relacionados entrada ( geralmente teclado), saída ( geralmente o monitor) e o de error quando algo sai diferente do esperado e o sistema operacional lida com esse erro se possível ou encerra o processo. 
+Para contextualizar, podemos dizer que arquivos de descrição são estruturas de dados armazenadas no kernel para cada arquivo que estão em uso por algum processo, seja para ler, escrever ou ambos, e elas possui um campo que guarda um valor numérico que representa esse arquivo que nos é retornado pelo sistema operacional quando fazemos uma chamada de sistema para alguma dessas operações. Porém existem três desses estruturas de dados que não estão relacionadas diretamente a arquivos, mas sim com o sistema de entrada e saída de dados, chamadas de I/O streams. Quando executamos programas no terminal do linux, e usamos redirecionadores ou pipes estão lidando ou deixando de lidar com esses arquivos de descrição. Conhecidos como stdin, stdout e stderror, esse são arquivos de descrição padrão[^1] relacionados entrada ( geralmente teclado), saída ( geralmente o monitor) e o de error quando algo sai diferente do esperado e o sistema operacional lida com esse erro se possível ou encerra o processo. 
 
 Realizando o mesmo procedimento anterior é possivel encontrar agora um manual de funções das bibliotecas em C que nos da informações sobre esses streams de dados juntamente com o numero que é usado para designar cada um. (man -k stdin)
 
-> **Note$^{1}$ :** Conforme descrito na biblioteca os arquivos de descrição padrão são ponteiros para FILE, que poderíamos fazer analogia como se fossem um objeto no kernel que armazena diversas informações relacionadas a arquivos que possuem processos interagindo com eles (buffer de memoria e metadados), enquanto o arquivo de descrição pode ser visto como uma propriedade desse objeto que armazena um valor inteiro positivo. 
+ [^1]:Conforme descrito na biblioteca os arquivos de descrição padrão são ponteiros para FILE, que poderíamos fazer analogia como se fossem um objeto no kernel que armazena diversas informações relacionadas a arquivos que possuem processos interagindo com eles (buffer de memoria e metadados), enquanto o arquivo de descrição pode ser visto como uma propriedade desse objeto que armazena um valor inteiro positivo. 
 
 Finalmente na parte final de todas essas variáveis criadas, temos a LINUX_SYSCALL com o valor 0x80. Não encontrei uma referencia de como descobrir algum lugar que especifique esse valor para chamar interrupções no processador, mas esse código tem um significado especial, que tem uma relação direta para podermos realizar chamadas de sistema, pois enquanto a chamada de sistema permite a execução de codigo em memoria na area do kernel em favor do usuário, uma interrupção é uma flag disponível no processador que poderá ser acessada pelo kernel informando que um evento ocorreu e que ele precisa dar alguma atenção para ele, seja o colocando em uma fila, ou parando o que esta fazendo e executando algo relacionado a essa interrupção. 
 

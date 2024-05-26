@@ -5606,7 +5606,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:0.17.x || 0.18.x || 0.19.x || 0.20.x":
+"esbuild@npm:0.17.x || 0.18.x || 0.19.x || 0.20.x, esbuild@npm:0.20.2":
   version: 0.20.2
   resolution: "esbuild@npm:0.20.2"
   dependencies:
@@ -7115,7 +7115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.0.11":
+"husky@npm:^9.0.0":
   version: 9.0.11
   resolution: "husky@npm:9.0.11"
   bin:
@@ -7167,6 +7167,17 @@ __metadata:
   version: 5.3.1
   resolution: "ignore@npm:5.3.1"
   checksum: 71d7bb4c1dbe020f915fd881108cbe85a0db3d636a0ea3ba911393c53946711d13a9b1143c7e70db06d571a5822c0a324a6bcde5c9904e7ca5047f01f1bf8cd3
+  languageName: node
+  linkType: hard
+
+"image-size@npm:1.0.0":
+  version: 1.0.0
+  resolution: "image-size@npm:1.0.0"
+  dependencies:
+    queue: 6.0.2
+  bin:
+    image-size: bin/image-size.js
+  checksum: 2d9d1edc43c0fa8effd27c44cd2d1b02ecc963219e78a76ac80b9d363f69c5aa19990cc23a323959ea510742ff07667e231f0852fd57eba5dc5b55432b58106d
   languageName: node
   linkType: hard
 
@@ -10060,6 +10071,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"queue@npm:6.0.2":
+  version: 6.0.2
+  resolution: "queue@npm:6.0.2"
+  dependencies:
+    inherits: ~2.0.3
+  checksum: ebc23639248e4fe40a789f713c20548e513e053b3dc4924b6cb0ad741e3f264dcff948225c8737834dd4f9ec286dbc06a1a7c13858ea382d9379f4303bcc0916
+  languageName: node
+  linkType: hard
+
 "react-activity-calendar@npm:^2.2.8":
   version: 2.2.8
   resolution: "react-activity-calendar@npm:2.2.8"
@@ -11647,6 +11667,7 @@ __metadata:
     autoprefixer: ^10.4.13
     contentlayer2: 0.4.4
     cross-env: ^7.0.3
+    esbuild: 0.20.2
     eslint: ^8.45.0
     eslint-config-next: 14.2.1
     eslint-config-prettier: ^8.8.0
@@ -11655,7 +11676,8 @@ __metadata:
     github-slugger: ^2.0.0
     gray-matter: ^4.0.2
     hast-util-from-html-isomorphic: ^2.0.0
-    husky: ^9.0.11
+    husky: ^9.0.0
+    image-size: 1.0.0
     lint-staged: ^13.0.0
     next: 14.2.1
     next-contentlayer2: 0.4.4
