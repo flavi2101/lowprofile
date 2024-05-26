@@ -14,7 +14,7 @@ Meu "echo" em assembly!
 
 Continuando na jornada de aprender assembly como fundamento para aprendizados futuros,
 compartilho com vocês o meu processo para desenvolver um o echo programa do linux em asssembly.
-Isso não é completamente uma verdade, ja que o original o texto que será exibido na tela e passado como argumento do programa,
+O título esta em aspas, porque no original o texto que será exibido na tela e passado como argumento do programa,
 o que acredito não mudar muita coisa, e com certeza faremos um futuro proximo. 
 
 
@@ -27,28 +27,32 @@ Imprimi na tela o que voce digitou no terminal ( que explicação incrivel e det
 Desculpe, mas não a muito mais que dizer, é isso mesmo.
 O programa echo pega o argumento passado na chamada da função e o retorna imprimindo no terminal, assim: 
 
-```
+```shell:echo
 echo "Hell world!!"
 Hell world!!
 ```
 Outro motivo que confirma que o quê vamos apresentar aqui não pode ser chamado como uma segunda versão do echo,
-é porque se voce digitar no terminal *man echo* voce verá várias opções de como pode ser interpretado a string que esta passando como argumento.
+é porque se você digitar no terminal do linux *man echo* voce verá várias opções de como pode ser interpretado a string que esta passando como argumento.
 Mas isso esta fora do nosso escobo. Focaremos no básico, escrever um codigo assembly para imprimir na tela um input.
 
 ## Tangente Necessárias
 
-Temos que ter em mente que um programa escrito em assembly ainda não é um codigo binário com instruções e dados que podem ser interpretado pelo processador, para isso iremos precisar de dois programas disponíveis em quase toda instalação linux, um programa de assembler, que irá transforma o codigo assembly, que são um conjunto de instruções escritas em um formato humano que serão interpretadas como comandos a serem executados pelo processador. Lembrando que cada fabricante de processador usa seus próprios conjunto de instruções para seu processador, também conhecido como ISA (instruction set architecture) que são interpretadas para executar uma determinada ação. Segundo  Harris e Harris, 2013
+Temos que ter em mente que um programa escrito em assembly ainda não é um codigo binário com instruções e dados que podem ser interpretado pelo processador, para isso iremos precisar de dois programas disponíveis em quase toda instalação linux, um programa de assembler, que irá transforma o codigo assembly[^1]. Lembrando que cada fabricante de processador usa seus próprios conjunto de instruções para seu processador, também conhecido como ISA (instruction set architecture) que são interpretadas para executar uma determinada ação. Segundo  [@Harris2013]
+
+[^1]: São um conjunto de instruções escritas em um formato humano que serão interpretadas como comandos a serem executados pelo processador
 
 > The instructions sets of different architectures are more like different dialects than different languages.
 
 Algums pontos relevantes antes de iniciar o codigo do "echo":
 
- - Uma instrução em assembly é definida por um conjunto de três de informações, um mnemônico que representa a ação que o processador ira executar, e dois operante, um de destino e um de origem.
- - Existem mais de uma sintaxe para escrever essa instrução, sendo elas AT&T e Intel, que diferem bastante em como são [escritas](https://imada.sdu.dk/u/kslarsen/dm546/Material/IntelnATT.htm). Essa informação esta relacionada diretamente com a ferramenta de assembler em que irá passar seu código do que com o conjunto de instruções que o processador entende. Existe uma sintaxe default para cada assembler, e caso esteja usando uma diferente voce tem que especificar que a esta usando. No nosso exemplo, como estamos usando o programa 'as' da GNU o AT&T é o default.
- - Existem famílias de processadores, e nelas existem o que chamamos de arquitetura, que são as instruções que ele entende, memoria chamadas registradores, memoria chamadas de cache, predição de condicional ( descrição muito, muito simplificada). 
- - Podemos ainda dividir arquitetura dos processadores em RISC ( reduced instruction set computer) e CISC (complex instruction set computers). A principal diferença entre essas é a complexidade delas, Harris e Harris, 2013 exemplifica que em processadores intel x86 (CISC) existe a instrução "string move", que copia uma string to um local da memória para outra, enquanto que para realizar a mesma operação em processador que tem instruções do tipo RISC precisaríamos de várias instruções mais simples. Em contrapartida, quanto maior o numero de instruções e complexidades, maior o numero de bits necessários pare representá-lo, o que impacta diretamente no tamanho dos registradores para receber essas informações, espaço que elas iram ocupar em memorias além de que, como a complexidade para definir tamanho diferente para instruções iria criar uma complexidade muito grande no sistema, logo mesmo as instruções mais simples também iram ter o mesmo tamanho (numero de bits) que uma instrução mais complexa.
- - Por ultimo, os processadores podem ser 8,16,32 e 64 bits. Esse numero se refere ao tamanho da informação que os registradores consegue armazenar em binário, um processador em que seus registradores tem o tamanho de 32 bits, podem armazenar $2^{32}$  informações diferentes, que representa 4.294.967.296 possibilidades, ( ou 4 Gigabytes ). Essa informação é importante porque precisamos informar para nossas ferramentas que vão transformar nosso assembly em binário que nosso processador tem esse tipo de arquitetura. 
- - Duas curiosidades: Mesmo se nosso processador for 64 bits ainda conseguimos rodar um programa de 32 bit pois os fabricantes o fizeram de tal forma que essa compatibilidade não fosse perdida e diversos softwares já criados não precisassem ser refeitos (  para os usuários de windows, ja reparam no diretório C: duas pastas chamadas **arquivos de programa (x86)** e **arquivo de programas**? Pois bem, os softwares 32 bits estão na pasta X86. A outra curiosidade é que essa limitação nos registradores influenciava na capacidade de memória dos computadores, não que voce não poderia ter mais de 4 Gb de memoria com um processador de 32 bits, mas seria um desperdício de dinheiro, visto que posições da memoria ( endereço ) maiores que 32 bis não poderiam armazenar instruções e dados, porque o processador não conseguiria acessá-los.
+ - Uma instrução em assembly é definida por um conjunto de três informações: um mnemônico que representa a ação que o processador irá executar, e dois operandos, um de destino e um de origem.
+ - Existem mais de uma sintaxe para escrever essas instruções, sendo elas AT&T e Intel, que diferem bastante em como são [escritas][@Larsen2024]. Essa informação está relacionada diretamente com a ferramenta de assembler que irá interpretar as instruções para que o processador as entenda. Existe uma sintaxe padrão para cada assembler. No nosso exemplo, como estamos usando o programa 'as' da GNU, o AT&T é o padrão.
+ - Existem famílias de processadores, que possuem arquiteturas que são as instruções que ele entende, memória chamada registradores e cache, predição de condicional (descrição bastante simplificada). 
+ - Podemos ainda dividir a arquitetura dos processadores em RISC (reduced instruction set computer) e CISC (complex instruction set computers). A principal diferença entre essas é a complexidade delas. [@Harris2013] exemplifica que em processadores Intel x86 (CISC) existe a instrução "string move", que copia uma string de um local da memória para outro, enquanto que para realizar a mesma operação em um processador que tem instruções do tipo RISC seriam necessárias várias instruções mais simples. Em contrapartida, quanto maior o número de instruções e complexidades, maior o número de bits necessários para representá-lo, o que impacta diretamente no tamanho dos registradores para receber essas informações, no espaço que elas ocuparão em memória, além de que, já que definir tamanhos diferentes para as instruções criaria uma complexidade muito grande no sistema, mesmo as instruções mais simples também terão o mesmo tamanho (número de bits) que uma instrução mais complexa.
+ - Por último, os processadores podem ser classificados em 8, 16, 32 e 64 bits. Esse número se refere à quantidade de bits (informações) que os registradores conseguem armazenar em binário. Um processador em que seus registradores têm o tamanho de 32 bits pode armazenar $2^{32}$ informações diferentes, que representam 4.294.967.296 possibilidades (ou 4 Gigabytes). Essa informação é importante porque precisamos informar para nossas ferramentas que vão transformar nosso assembly em binário que nosso processador tem esse tipo de arquitetura.[^2]
+ 
+ [^2]: Curiosidades: Mesmo se nosso processador for 64 bits, ainda conseguimos rodar um programa de 32 bits, pois os fabricantes o fizeram de tal forma que essa compatibilidade não fosse perdida e diversos softwares já criados não precisassem ser reescritos (para os usuários de Windows, já repararam no diretório C: duas pastas chamadas **Arquivos de Programas (x86)** e **Arquivos de Programas**? Pois bem, os softwares 32 bits estão na pasta x86). A outra é que essa limitação nos registradores influencia na capacidade de memória dos computadores, não que você não poderia ter mais de 4 GB de memória com um processador de 32 bits, mas seria um desperdício, visto que posi
+
  
  Abaixo alguns exemplos de processadores.
   
@@ -67,26 +71,30 @@ Iremos usar três ferramentas, duas para gerar o binário e uma para debugar (Li
 
  1. Nosso assembler para gerar o arquivo objeto, estamos passando a target-options "--32" para informar que nosso assembly usa a sintaxe para processador 32 bits. A flag "-o" é o arquivo de saída em que queremos escrever nosso binário. Esse arquivo é quase o nosso executável, nesse nosso exemplo especifico quase poderiamos dizer que é, já que não temos que linkar esse arquivo com nenhuma outra ( bibliotecas ou coisas do tipo que criam uma dependência entre arquivos, seriam os header files em programas escrito em C, por exemplo. )
 
-	 `as --32 <assembly_file.s> -o <object_file.o>`
+	 ```GNU:as
+	 as --32 <assembly_file.s> -o <object_file.o>
+	 ```
 
- 2. Para gerar o arquivo final precisamos linkar todos os objetos gerados pelo programa assembler no nosso binário final, para isso usaremos:
+ 2. Para gerar o arquivo final precisamos linkar todos os objetos gerados pelo programa assembler no nosso binário, para isso usaremos:
  
-    `ld -m elf_i386 <assembly_file.s> -o <object_file.o>`
+    ```GNU:ld
+		ld -m elf_i386 <assembly_file.s> -o <object_file.o>
+		```
 
-	 A flag "m" significa emulation, e precisamos dela para informar qual o formato que nosso binário terá em ordem que o nosso processador possa executá-lo. Depois passa o argumento, que é elf (executable and link format) - padrão de formato para execução binários no linux, e a família do processador que queremos que esse code seja execuado. Para vermos quias as opções de emulação podemos rodar o codigo.
+	 A flag "m" significa emulation, e precisamos dela para informar qual o formato que nosso binário terá em ordem que o nosso processador possa executá-lo. Depois passa o argumento, que é elf (executable and link format) - padrão de formato para execução binários no linux, e a família do processador que queremos que esse code seja executado. [^3]
 	
-	 `ld -V`
+	 [^3]: Para visualizarmos quais opções de arquitetura podemos rodar `ld -V`
 	 
- 3. Para podermos debugar o nosso codigo com maior eficiencia e maior versalidade, poderiamos usar o gdb nativo do GNU, mas optamos por usar no linux uma software livre chamado EDB (Evan´s Debugger) , que é um debugador de binário próprio para o linux. Futuramente vamos tentar iniciar o uso com a ferramenda  chamada IDA da empresa hex rays. 
+ 3. Para podermos debugar o nosso codigo com maior eficiencia e maior versalidade, poderiamos usar o gdb nativo do GNU, mas optamos por usar no linux uma software livre chamado EDB (Evan´s Debugger) , que é um [debugador](https://codef00.com/) de binário próprio para o linux. 
 
 ## Quase ECHO
 
-### SESSÃO DE DADOS
+### Sessões
 
 #### Pseudo Instruções
-Acredito já ter citado, mas para reforçar, essa versão do código não aceita o input como parâmetro, primeiro iremos executar o programa, que irá deixar o terminal em modo de "escuta" para que possamos inserir a string.  Outro ponto importante é que esse codigo teve como base o exércicio proposto no livro programmingGroundUp.
+Acredito já ter citado, mas para reforçar, essa versão do código não aceita o input como parâmetro, primeiro iremos executar o programa, que irá deixar o terminal em modo de "escuta" para que possamos inserir a string.  Como referencia futura esse codigo teve como base o exércicio proposto no livro ProgrammingGroundUp[@Bartlett2004].
 
-Em nosso codigo assembly, precisamos passar algumas diretivas para o assembler para ele saber que tipo de informação estamos escrevendo em determinadas areas do nosso codigo, isso são chamado pseudo-operantes[@IBM], são palavras chaves no nosso codigo que não são interpretadas como instruções, mas sim uma marcação para dizer o assembler o que o codigo dentro daquela sessão se refere. E por falar em sessão, esse é uma diretiva (sinonimo de pseudo-operantes) que divide o codigo em, sessão de dados, onde variaveis globais são escritas e o assembler sabera que precisará reservar memoria para essas informações.
+Em nosso codigo assembly, precisamos passar algumas diretivas para o assembler para ele saber que tipo de informação estamos escrevendo em determinadas areas do nosso codigo, isso são chamado pseudo-operantes[@IBM], são palavras chaves no nosso codigo que não são interpretadas como instruções para gerar codigo de maquina, mas sim uma marcação para dizer o assembler o que o codigo dentro daquela sessão se refere. E por falar em sessão, esse é uma diretiva (sinonimo de pseudo-operantes) que divide o codigo em, sessão de dados, onde variaveis globais são escritas e o assembler saberá que precisará reservar memoria para essas informações (No nosso exemplo não iremos reserva essa memoria).
 
 `.section .data` 
 
@@ -94,9 +102,11 @@ A próxima sessão será a de texto, que é onde esta nosso codigo que será tra
 
 `.section .text`
 
-Para informar o assembler que precisaremos de um espaço de memoria para que alguma informação seja alocada em tempo de execução ( não precisemos iniciar com algum valor ), usaremos outra diretiva, que reservará na stack da memoria uma area chamada buffer, que é onde a string do input será armazenada para depois ser exibida na tela. **
+Para informar o assembler que precisaremos de um espaço de memória para que alguma informação seja alocada em tempo de execução ( não precirasemos iniciar com algum valor ), usaremos outra diretiva, que reservará uma área da memória chamada de buffer[^4], que é onde a string do input será armazenada para depois ser exibida na tela. 
 
-~~Para entender um pouco de como a mal definição dessa area pode abrir brechas de ataque de overflow clique aqui~~
+[^4]: No contexto do nosso programa faz sentido chamar essa área de memoria reservada pelo .bss de buffer porque vai ser usado como tal, mas o .bss representa um espaço reservado em que não foi iniciado com nenhum valor, logo não assuma que essa diretiva será sempre para um buffer.
+
+<p style={{color:'red'}}>Para entender um pouco melhor sobre a nomeclatura das areas de memoria em processo clique aqui</p>
 
 `.section .bss`
 
@@ -104,7 +114,7 @@ Pronto, agora que esclarecemos o que são sessões e o porque de as usarmos vamo
 
 #### Variáveis,  chamadas de sistema e arquivos de descrição
 
-```
+```GNU:fakeECHO.s
 .code32
 .section .data
 	.equ SYS_WRITE, 4
@@ -132,70 +142,103 @@ Pronto, agora que esclarecemos o que são sessões e o porque de as usarmos vamo
 | STDERR | valor que representa o arquivo descritivo de algum erro |
 | LINUX_SYSCALL| valor que representa uma interrupção para realizar uma system call |
 
- ~~Para entender o que é uma system call e interrupção, clique aqui;~~
- ~~Para entender o que é um arquivo descritivo clique aqui;~~
+<p style={{color:'red'}}> Para entender o que é uma system call e interrupção, clique aqui;</p>
+<p style={{color:'red'}}>Para entender o que é um arquivo descritivo clique aqui;</p>
 
-#### Encontrando informações
+### Encontrando informações
 
-Como o objetivo e nunca ficar decorando esse tipo de informação, aqui usamos as definições das bibliotecas escritas em C para descobrir esses valores. 
+Como o objetivo é nunca ficar decorando comandos, aqui usaremos as definições das bibliotecas escritas em C para descobrir esses valores que declaramos nas variáveis usando *.equ*. 
 
 Podemos usar o comando man -k ou man man, para descobrir algumas formas de pesquisar por programas e system call. Como exemplo vamos pesquisar informações sobre a system call read.
+
+> <p style={{color:'greenyellow'}}>  Caso prefira um jeito mais direto, é mais simples pesquise na internet: 'System call x86 table linux'. <span hidden='true'>[@chromiumSyscalls]</span> </p> 
+
+
 
 Vamos ver se o manual tem alguma informação sobre system call
 
 	`man man`
 
-~~## Inserir imagem das section of man man~~
+
+![man](/static/images/posts/man_man.png)
+![man-sections](/static/images/posts/man_sections.png)
+
 Da imagem é possivel verificar que system calls estão na sessão numero dois do manual.
 
-Não sabemos o nome do todas as system call que o sistema operacional nos oferece, mas podermos fazer uma suposição que para ler ou escrever algo provavelmente existe uma sys call com esse nome, vamos pesquisar (veja que a flag -k também esta descrita no manual do manual)man .
+Não sabemos o nome do todas as system call que o sistema operacional nos oferece, mas podermos fazer uma suposição que para ler ou escrever algo provavelmente existe uma sys call com esse nome, vamos pesquisar (veja que a flag -k também esta descrita no manual do manual) man .
 
 	`man -k read` 
-~~## Inserir imagem das opções~~
+![sys-call-read](/static/images/posts/syscall_read.png)
 
 Tivemos um retorno com várias opções em que há algo relacionado com read, e podemos perceber que ainda existe um numero na frente do programa e depois uma descrição breve do que ele faz. Na função read temos na frente o numero dois, justamente o numero que vimos como a sessão de system call do manual.
 
-Essa parte pode parecer não muito significante, mas faça um teste agora, digite no terminal esses dois comando e veja se obtém o mesmo retorno.
+Essa parte pode parecer não muito significante, mas faça um teste, digite no terminal esses dois comando e veja se obtém o mesmo retorno.
 
-       1- man read
-       2- man read.2
+       1. man read
+       2. man read.2
  
-~~Caso queira ver uma breve curiosidade sobre o uso de man, help e info clique aqui~~
+<p style={{color:'red'}}>Caso queira ver uma breve curiosidade sobre o uso de man, help e info clique aqui</p>
 
-Pois bem, agora em posse da informação de como foi implementado essa system call na linguagem C, vamos analisar alguns informações importante na sessão "SYNOPSIS".
-```
+Pois bem, agora em posse da informação de como foi implementado essa system call na linguagem C, vamos analisar alguns informações importante na sessão "SYNOPSIS" após digintar man *read.2* no terminal.
+```UNIX:SYNOPSIS
     #include <unistd.h>
     ssize_t read(int fd, void buf[.count], size_t count);
 ```
-##### Chamadas de Sistema
-Esse código mostra a header que essa biblioteca usa e mostra a assinatura da função read, como o que ela retorna, e quais parâmetros ela recebe.
+#### Chamadas de Sistema
+A informação acima mostra a header usada pela nossa syscall  e também a assinatura da função read, como: - o que ela retorna, quais são os parametros que ela recebe e seus tipos.
 
-Vamos verificar o que existe dentro dessa header que uma essa biblioteca usa para linkar com suas funcionalidades.
 
-    find /usr/include -type f -name "unistd.h"
+
+Vamos acha essa header[^6] e ver seu código.
+[^6]: São arquivos que na fase de pre processamento do compilador seu contúdo (declarações de funçoes, macros...) que precisam ser compartilhados por multiplos arquivos e são literalmente compiados para o arquivo onde a chamda **#incude** foi inserida.
+
+```UNIX:find
+	find /usr -type f -name "unistd.h"
+		
+```
+		
 
 Voce pode usar esse comando na pasta root do seu sistema se não fizer nenhuma ideia de onde pode encontrar esse arquivo, no exemplo coloquei um caminho próximo para diminuir o tempo de busca.
-Após uma pesquisa nos arquivos que foram encontrados podemos ver um arquivo que corresponde a arquitetura do nosso processador, dando uma olhada nele, 
 
-~~Inserir imagem do arquivo~~
+
+![unistd](/static/images/posts/find_unistd.png)
+
+
+Nos arquivos encontrados podemos ver que alguns são para arquiteturas x86_64 (64 bits) e outros não fica muito claro o que elas fazem. Como chamada de sistemaa representa uma API fornecida pelo sistema operacional e estamos querendo descobrir os valores de chamadas de sistema para uma codigo assembly x86, vamos dar uma olhada no unico arquivo que se encaixa nessa descrição, ou seja, esta na pasta unix api (uapi) e é para sistema 32 bits.
+
+```UNIX:cat
+cat /usr/lib/linux/uapi/x86/asm/unistd.h
+```
+
+![i836flag](/static/images/posts/i386flag.png)
 
 percebmos que é uma header com alguma condições para incluir ou não outras dependências. Vemos que para um sistema i386 ele inclui a header asm/unistd_32.h. Vamos fazer uma nova pesquisa e ver se encontramos esse arquivo.
 
-~~Inserir imagem da find . -name "unistd_32.h"~~
 
-Encontramos novamente um arquivo com a nossa arquitetura e com o caminho indicado no arquivo anterior, vamos dar um cat e ver o que tem nesse arquivo.
 
-~~Image das header e das sistem calls~~
+Parece que ainda não encontramos algo que nos de alguma pista de quais valores representam chamadas de sistema no linux, porém parece existir uma condição nesse arquivo que nos interessa. Se em algum lugar estiver definido como "__i386__" uma header sera incluida em algum lugar.Vamos tentar procurar esse arquivo.Abaixo segue o que encontramos na pesquisa e o quê há dentro desse arquivo.
+
+```UNIX:find
+find /usr -type f -name unistd_32.h
+```
+
+![findSysCallTable](/static/images/posts/unistd_32.png)
+
+![SysCallTable](/static/images/posts/table_syscall.png)
 
 Pronto, nesse arquivo encontramos as configurações do sistema operacional que permitem que usuários comum façam requisições a ele para que possa executar alguma ação em nome desse usuário (system calls table).
 
-##### Arquivos de descrição
+#### Arquivos de descrição
 
-Para contextualizar, podemos dizer que arquivos de descrição são estruturas de dados armazenadas no kernel para cada arquivo que estão em uso por algum processo, seja para ler, escrever ou ambos, e elas possui um campo que guarda um valor numérico que representa esse arquivo que nos é retornado pelo sistema operacional quando fazemos uma chamada de sistema para alguma dessas operações. Porém existem três desses estruturas de dados que não estão relacionadas diretamente a arquivos, mas sim com o sistema de entrada e saída de dados, chamadas de I/O streams. Quando executamos programas no terminal do linux, e usamos redirecionadores ou pipes estão lidando ou deixando de lidar com esses arquivos de descrição. Conhecidos como stdin, stdout e stderror, esse são arquivos de descrição padrão[^1] relacionados entrada ( geralmente teclado), saída ( geralmente o monitor) e o de error quando algo sai diferente do esperado e o sistema operacional lida com esse erro se possível ou encerra o processo. 
+Para contextualizar, podemos dizer que arquivos de descrição é um valor presente em uma estruturas de dados armazenadas no kernel para cada arquivo que está interagindo com algum processo, seja para ler, escrever ou ambos. Este valor nos é retornado pelo sistema operacional quando fazemos uma chamada de sistema para alguma dessas operações com esses arquivos.
+
+> Na assinatura da função read do nosso exemplo o primeiro argumento 'fd' é o file descriptor (arquvio de descrição)
+
+Porém, existem três arquivos de descrição que não estão relacionadas diretamente a arquivos, mas sim com o sistema de entrada e saída de dados, chamadas de I/O streams. Quando executamos programas no terminal do linux, e usamos redirecionadores ou pipes, estamos lidando ou deixando de lidar com esses arquivos de descrição - <span style={{color:'red'}}>caso não tenha entendido muito bem essa parte, veja se isso ajuda</span>. Conhecidos como stdin, stdout e stderror, esse são arquivos de descrição padrão[^7] relacionados entrada ( geralmente teclado), saída ( geralmente o monitor) e o de error quando algo sai diferente do esperado e o sistema operacional lida com esse erro se possível ou encerra o processo. 
 
 Realizando o mesmo procedimento anterior é possivel encontrar agora um manual de funções das bibliotecas em C que nos da informações sobre esses streams de dados juntamente com o numero que é usado para designar cada um. (man -k stdin)
 
- [^1]:Conforme descrito na biblioteca os arquivos de descrição padrão são ponteiros para FILE, que poderíamos fazer analogia como se fossem um objeto no kernel que armazena diversas informações relacionadas a arquivos que possuem processos interagindo com eles (buffer de memoria e metadados), enquanto o arquivo de descrição pode ser visto como uma propriedade desse objeto que armazena um valor inteiro positivo. 
+ [^7]:Conforme descrito na biblioteca os arquivos de descrição padrão são ponteiros para FILE, que poderíamos fazer analogia como se fossem um objeto no kernel que armazena diversas informações relacionadas a arquivos que possuem processos interagindo com eles (buffer de memoria e metadados), enquanto o arquivo de descrição pode ser visto como uma propriedade desse objeto que armazena um valor inteiro positivo. 
 
 Finalmente na parte final de todas essas variáveis criadas, temos a LINUX_SYSCALL com o valor 0x80. Não encontrei uma referencia de como descobrir algum lugar que especifique esse valor para chamar interrupções no processador, mas esse código tem um significado especial, que tem uma relação direta para podermos realizar chamadas de sistema, pois enquanto a chamada de sistema permite a execução de codigo em memoria na area do kernel em favor do usuário, uma interrupção é uma flag disponível no processador que poderá ser acessada pelo kernel informando que um evento ocorreu e que ele precisa dar alguma atenção para ele, seja o colocando em uma fila, ou parando o que esta fazendo e executando algo relacionado a essa interrupção. 
 
