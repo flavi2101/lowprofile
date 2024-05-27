@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
 import { CoreContent } from 'pliny/utils/contentlayer'
-import type { Blog } from 'contentlayer/generated'
+import type { Blog } from '.contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import tagData from 'app/tag-data.json'
@@ -79,7 +79,8 @@ export default function ListLayoutWithTags({
   const { t } = useTranslation()
   const currentLang = useContext(LanguageContext).currentLang
 
-  const displayPostsByLanguage = displayPosts.filter((post) => post.language === currentLang)
+  const displayPostsByLanguage = displayPosts.filter((post) => post.language === currentLang && post.draft !== true)
+
 
   return (
     <>
