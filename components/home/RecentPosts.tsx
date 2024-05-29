@@ -2,7 +2,7 @@
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer'
-import { allBlogs } from 'contentlayer/generated'
+import { allBlogs } from '.contentlayer/generated'
 import { formatDate } from 'pliny/utils/formatDate'
 import { useTranslation, LanguageContext } from 'utils/locale'
 import { useContext } from 'react'
@@ -11,7 +11,7 @@ const MAX_DISPLAY = 5
 
 export default function RecentPosts() {
   const sortedPosts = sortPosts(allBlogs)
-  const posts = allCoreContent(sortedPosts)
+  const posts = allCoreContent(sortedPosts).filter(post => post.draft !== true)
   const { t } = useTranslation()
   const currentLang = useContext(LanguageContext).currentLang
 

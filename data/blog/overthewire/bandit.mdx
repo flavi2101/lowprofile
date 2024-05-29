@@ -1,0 +1,56 @@
+---
+title: Bandit
+date: '2024-04-26'
+tags: ['linux', 'bandit', 'overthewire', ]
+draft: false
+summary: Desafios para aprender sobre comandos no sistema linux/GNU
+language: pt
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+---
+
+
+
+<div style={{backgroundColor:'green'}}>
+  <p style={{ color: 'yellow',paddingBlock: '4px',paddingInline: '16px',borderColor:'red',borderWidth: 'thick'}}> ATENÇÃO: AS INFORMAÇÕES CONDITAS AQUI SÃO PARA DEMOSTRAR UMA LINHA DE RACIOCÍNIO PARA SOLUCIONAR PROBLEMAS ESPECÍFICOS, SE REALMENTE DESEJA APRENDER ATRAVÉS DESSA PLATAFORMA E DESSES EXERCÍCIOS TENTE REALIZÁ-LOS POR SUA CONTA, TENTATIVA E ERRO.</p>
+</div>
+
+<TOCInline toc={props.toc} asDisclosure toHeading={5} />
+
+# Ferramentas
+
+- Terminal
+- Quebrar o cocorutiu
+
+# Bandit - 00-01
+
+|COMANDOS|DESCRIÇÃO|
+|--------|---------|
+|ssh|OpenSSH remote login Client|
+|ss| Detalhar informações de sockets de comunicação - Substituto do netstat |
+
+
+SSH é uma ferramenta de conexão remota disponível do lado do cliente que irá se conectar com um serviço especíco em um servidor. Para que seja possivel o servidor precisa ter uma porta aberta esperando essa conexão (geralmente a 22). A utilização do ssh sobre outras ferramentas como o telnet se dá em virtude de forncer uma criptografia entre uma comunicação não segura (Internet por exemplo)
+
+
+```SSH:Especificacão_Destino
+1) user@hostname
+
+2) ssh://user@hostname[:port]
+```
+
+Como dito anteriormente a porta padão para conexão ssh é a 22, porém no exercício informa que devemos usar a porta 2220, e para isso precisamos passar a flag 'p' 
+
+```
+ssh bandit0@bandit.labs.overthewire.org -p 2220
+password: bandit0
+```
+
+Como informado na descrição do problema, na pagina do level encontramos a recomendação do que fazer para encontrar o password
+
+# Bandit - 01-02
+
+O password desse exercicio está em um arquivo denomainado '-'. Temos a opção de abrir esse arquivo com algum editor de texto, como o vi por exemplo, ou usar o comando `cat`, que concatena o conteúdo de arquivos e os exibi na tela. O problema nesse exercícios é que o nome do arquivo esta no formado de uma bandeira para o interpretador shell entender que estamos passando uma opção para o nosso programa, ou seja se tentarmos fazer `cat -` ou  ` vi -` não vamos ter a resposta esperada, pois o shell vai manter o input padrão aberto esperando que digitemos algo mais. 
+
+Como é um simbolo especial precisamos dizer ao shell uma forma de interpretá-lo diferente. Ao tentar utilizar `cat \-` não obtivemos o resultado esperado, mas descobrimos uma funcionalidade interessante, passar **apenas** a contra barra no terminal faz com que seja interpretado como um caracter de escape, de forma que podemos escrever um script shell em várias linhas (Para cada quebra de linha inserimos no final `\`) até dar o comando de execução (enter).
+
+No final, a única coisa que funcionou foi passar o nome do arquivo como se fosse um executável do linux, seguindo dessa forma: `cat ./-`. Dessa forma conseguimos obter a senha para o próximo desavio.

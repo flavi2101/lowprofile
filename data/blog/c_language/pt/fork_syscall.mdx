@@ -1,0 +1,113 @@
+---
+title: Chamada de sistema - FORK
+date: '2024-04-26'
+tags: ['fork', 'process', 'operating_system', 'c_language', 'syscall']
+draft: false
+summary: Como implementar o programa echo em assembly x86
+language: pt
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+---
+
+A função fork é uma chamada de sistema disponibilizada pelo sistema operacional para criar novos processo. É uma abstração disponibilizada pelo sistema operacional para que um programa possa ser iniciado. Após todo sistema de boot ser iniciado e o boat loader ter alocado o sistema operacional na memória pricipal, este inicia o primeiro processos no modo de usuario ( em linux é o processo init, em windows é o processo smss.exe) [@attila_operating_2013]
+
+<TOCInline toc={props.toc} asDisclosure toHeading={5} />
+
+# Introdução
+
+Vamos transcrever o que o manual dessa chamada de sistema diz sobre ela:
+
+>Fork cria um novo processo através da duplicação do processo inicial. O novo processo é descrito como filho e o processo que fez a chamada é definido como pai. O processo filho é uma cópia do pai, possuindo os mesmo valores de registradores e variáveis.
+
+Na documentação descreve que apesar de ser uma cópia, o processo filho tem  PID[^1] diferentes, alguns atributos são reiniciados os valores e algumas area de mémoria não são herdados. Caso queira os detalhes dessas exceções descritas no manual [clique aqui](/lowprofile/data/blog/c_language/pt/excecoes_heranca_fork)
+
+[^1]: Identificação do processo 
+
+Outro ponto importante que precisa ser extraído da documentação é o retorno dessa chamada de sistema:
+
+
+<table role="table" aria-label="Process Information">
+  <thead>
+    <tr role="row">
+      <th role="columnheader">&nbsp;</th>
+      <th role="columnheader">Processo Pai</th>
+      <th role="columnheader">Processo Filho</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr role="row">
+      <td role="cell"><strong>Sucesso</strong></td>
+      <td role="cell" headers="parent-header" id="success-parent">Recebe o ID do processo filho</td>
+      <td role="cell" headers="child-header" id="success-child">Tem seu Id definido como 0</td>
+    </tr>
+    <tr role="row">
+      <td role="cell"><strong>Erro</strong></td>
+      <td role="cell" headers="parent-header" id="error-parent"> Fork retorna para o pai o valor -1</td>
+      <td role="cell" headers="child-header" id="error-child"> Não é criado e um numero de erro é gerado</td>
+    </tr>
+  </tbody>
+</table>
+
+No codigo abaixo podemos ver um exemplo de como fork atual dentro de um processo
+
+```Example:forkt.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+ int
+ main(void) {
+     pid_t pid;
+     int variavel_global=455
+     pid = fork();
+     switch (pid) {
+      case -1:
+        perror("fork");
+        exit(EXIT_FAILURE);
+      case 0:
+        puts("Child exiting.");
+        printf("variavel global inside child: %d \n",variavel_global)
+        exit(EXIT_SUCCESS);
+      default:
+        printf("variavel global inside parent: %d \n",variavel_global)
+        printf("Child is PID %jd\n", (intmax_t) pid);
+        puts("Parent exiting.");
+        exit(EXIT_SUCCESS);
+      }
+ }
+```
+
+```
+variavel global inside parent: 455 
+Child is PID 2409
+Parent exiting.
+Child exiting.
+variavel global inside child: 455
+```
+
+![sys-call-read](/static/images/posts/forkt.png)
+
+A ideia do fork é como se após a chamada dessa função, todo o codigo que estiver abaixo vai ser executado duas vezes. Por isso utilizamos condicionais baseadas no retorno da chamada de sistema. Para o retorno que é igual a zero rodamos o codigo do processo filho, para o que for maior que zero rodamos no processo pai. Caso o valor fosse menor que zero houve um erro em criar o fork, logo apenas o codigo pai continua a execução e não há processo filho.
+
+[^2] Uma forma de ver a associação entre processo pai e filho é através do status do processo.Vamos executar um exemplo para entedermos como isso funciona. [^3]
+
+```GNU:BASH
+
+yes  # programa que imprime a palavra yes no terminal
+[^z] # Significa ctrl+z => Irá suspender o programa e retonar o controle para o bash
+ps   # programa que imprime a identificação do processo  (PDI)
+
+```
+[^2]: Poder usar o comando `fg` (foreground) para retomar a execução desse proceso. Para ver a lista de programas que estão com o estatus suspenso utilize o comando `jobs`.
+
+[^3]: `man bash` e jobs controll é onde conseguimos informações sobre esses caracteres especias(^z) com proposito específico
+
+Com essas informações podemos navegar até diretório desse processo e ver seu status:
+
+`cat /proc/<PID>/status `
+
+Esse comando irá nos retornar diversas informações relacionadas a esse proceso, como nome, mascara de acesso, estado...
+No nosso exemplo iremos dar atenção ao **Pid** e ao **PPid**. O primeiro refere-se a identificação do processo que estamos analisando, no nosso exemplo, o processo yes. Já o PPid refere-se ao processo pai, que no nosso exemplo é a identificação do bash onde foi executado. Podemos fazer essa conferência com os valores de PID que retornaram do nosso comando **ps**. 
+
+Achei pertinente inserir essa informação aqui, pois é importante entender **como** os PIDs estão relacionados ao uso da função fork. Quando esta é chamada, ela retorna o valor zero no processo filho e o __PID do filho__ no processo pai. Esse valor é usado para distinguir entre os dois processos, mas não deve ser confundido com o próprio PID dos processos. Este é um identificador único para cada processo, enquanto o valor retornado pelo fork ajuda a controlar o fluxo de execução entre pai e filho.
+
+# Referência 

@@ -1,0 +1,35 @@
+---
+title: Simbologia em Documentação Técnica
+date: '2024-04-26'
+tags: ['linux', unix ]
+draft: false
+summary: Significado de simbolos na synopse dos manuis de programas UNIX
+language: pt
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+---
+
+A documentação descrevendo o funcionamento e as funcionalidades de diversos programas do sistema UNIX e seus derivados é ferramenta chave para quem quer dominar esse sistema versátil e tão poderoso, por isso é importante saber alguns padrões de representatividade que encontramos em quase todos os documentos. Abaixo segue um exemplo da sinopse do comando SHH. Aqui descreveremos como entender essa simbologia.
+
+```MAN:SYNOPSE
+  ssh    [-46AaCfGgKkMNnqsTtVvXxYy]    [-B    bind_interface]    [-b    bind_address]   [-c   cipher_spec]
+           [-D  [bind_address:]port]   [-E   log_file]   [-e   escape_char]   [-F   configfile]   [-I   pkcs11]
+           [-i  identity_file]  [-J  destination]  [-L  address]  [-l  login_name]  [-m  mac_spec] [-O ctl_cmd]
+           [-o option] [-P tag] [-p port] [-R address] [-S ctl_path] [-W host:port] [-w local_tun[:remote_tun]]
+           destination [command [argument ...]]
+       ssh [-Q query_option]
+```
+
+- Chaves `[ ]`:
+  -Indica que essa flag ou comando é opcional, é uma funcionalidade extra no programa.
+
+- Simbolos de maior e menor ou parenteses angulares `< >`:
+  - Indica um campo que espera uma entrada do usuário, ou seja, espera que voce insira um valor nesse campo.
+
+- **Nenhuma simbologia, apenas texto**:
+  - Indica que esse campo é obrigatório, e que o programa não funcionará sem esse argumento.
+
+- Barra vertial `|`:
+  - Indica opção, é permitido usar uma e apenas uma das opções separadas pela barra.
+
+- Reticencia `...`:
+  - Indica que um ou mais argumentos podem ser fornecidos  

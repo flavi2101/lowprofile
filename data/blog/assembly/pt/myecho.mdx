@@ -2,11 +2,10 @@
 title: Como criar ECHO em Assembly
 date: '2024-04-26'
 tags: ['assembly', 'syscall', 'interrupts']
-draft: false
+draft: true
 summary: Como implementar o programa echo em assembly x86
 language: pt
-bibliography:
-  - 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
 ---
 
 
@@ -18,7 +17,7 @@ O título esta em aspas, porque no original o texto que será exibido na tela e 
 o que acredito não mudar muita coisa, e com certeza faremos um futuro proximo. 
 
 
-<TOCInline toc={props.toc} asDisclosure toHeading={4} />
+<TOCInline toc={props.toc} asDisclosure toHeading={5} />
 
 # Introdução
 
@@ -151,11 +150,11 @@ Como o objetivo é nunca ficar decorando comandos, aqui usaremos as definições
 
 Podemos usar o comando man -k ou man man, para descobrir algumas formas de pesquisar por programas e system call. Como exemplo vamos pesquisar informações sobre a system call read.
 
-> <p style={{color:'greenyellow'}}>  Caso prefira um jeito mais direto, é mais simples pesquise na internet: 'System call x86 table linux'. <span hidden='true'>[@chromiumSyscalls]</span> </p> 
+> <p style={{color:'green'}}> Caso prefira um jeito mais direto, é mais simples pesquisar na internet: 'System call x86 table linux' [^5]</p> 
 
+[^5]:[chromium Projects](https://www.chromium.org/chromium-os/developer-library/reference/linux-constants/syscalls/)
 
-
-Vamos ver se o manual tem alguma informação sobre system call
+Vamos ver se o manual tem alguma informação sobre system call 
 
 	`man man`
 
@@ -236,37 +235,58 @@ Para contextualizar, podemos dizer que arquivos de descrição é um valor prese
 
 Porém, existem três arquivos de descrição que não estão relacionadas diretamente a arquivos, mas sim com o sistema de entrada e saída de dados, chamadas de I/O streams. Quando executamos programas no terminal do linux, e usamos redirecionadores ou pipes, estamos lidando ou deixando de lidar com esses arquivos de descrição - <span style={{color:'red'}}>caso não tenha entendido muito bem essa parte, veja se isso ajuda</span>. Conhecidos como stdin, stdout e stderror, esse são arquivos de descrição padrão[^7] relacionados entrada ( geralmente teclado), saída ( geralmente o monitor) e o de error quando algo sai diferente do esperado e o sistema operacional lida com esse erro se possível ou encerra o processo. 
 
-Realizando o mesmo procedimento anterior é possivel encontrar agora um manual de funções das bibliotecas em C que nos da informações sobre esses streams de dados juntamente com o numero que é usado para designar cada um. (man -k stdin)
+Realizando o mesmo procedimento anterior é possivel encontrar agora um manual de funções das bibliotecas em C que nos darão informações sobre esses streams de dados juntamente com o numero que é usado para designar cada um. 
+
+`man -k stdin`
+
+   <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }} summary="Table displaying standard input, output, and error file descriptors">
+      <thead>
+        <tr>
+          <th scope="col">stdin</th>
+          <th scope="col">stdout</th>
+          <th scope="col">stderr</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style={{ textAlign: 'center' }} aria-label="stdin">0</td>
+          <td style={{ textAlign: 'center' }} aria-label="stdout">1</td>
+          <td style={{ textAlign: 'center' }} aria-label="stderr">2</td>
+        </tr>
+      </tbody>
+    </table>
 
  [^7]:Conforme descrito na biblioteca os arquivos de descrição padrão são ponteiros para FILE, que poderíamos fazer analogia como se fossem um objeto no kernel que armazena diversas informações relacionadas a arquivos que possuem processos interagindo com eles (buffer de memoria e metadados), enquanto o arquivo de descrição pode ser visto como uma propriedade desse objeto que armazena um valor inteiro positivo. 
 
-Finalmente na parte final de todas essas variáveis criadas, temos a LINUX_SYSCALL com o valor 0x80. Não encontrei uma referencia de como descobrir algum lugar que especifique esse valor para chamar interrupções no processador, mas esse código tem um significado especial, que tem uma relação direta para podermos realizar chamadas de sistema, pois enquanto a chamada de sistema permite a execução de codigo em memoria na area do kernel em favor do usuário, uma interrupção é uma flag disponível no processador que poderá ser acessada pelo kernel informando que um evento ocorreu e que ele precisa dar alguma atenção para ele, seja o colocando em uma fila, ou parando o que esta fazendo e executando algo relacionado a essa interrupção. 
+Finalmente, na parte final de todas essas variáveis criadas, temos a LINUX_SYSCALL com o valor 0x80. Não encontrei uma referência específica que indique esse valor para chamar interrupções no processador (do tipo software), mas esse código tem um significado especial e está diretamente relacionado com a realização de chamadas de sistema. Durante essa chamada de sistema, ela permite a execução de código na área de memória do kernel em favor do usuário.
 
-### SESSÃO DE BUFFER
+Uma interrupção é um sinal disponível no processador que pode ser acessado pelo kernel, informando o que um evento ocorreu e que ele (processador) precisa dar atenção a essa solicitação do kernel, seja colocando-a em uma fila ou parando o que está fazendo para executar algo relacionado a essa interrupção
 
-    .section .bss
+#### Sessão de dados não inicializados
+
+  ```
+	.section .bss
 	.equ BUFFER_SIZE, 100 
 	.lcomm BUFFER_DATA, BUFFER_SIZE
 
-Nessa parte é onde estamos dizendo para o assembler criar uma variável (simbolo) chamada BUFFER_SIZE, e atribuir o valor 100 para ela, depois passamos a instrução lcomm que tem um comportamente parecido com a pseudo instrução *data*, porém, enquanto neste as variáveis estáticas precisam ser inicializadas, na sessão bss é apenas reservado o espaço( linux define zero para todo o espaço desse símbolo).
+	```
+Nessa parte é onde estamos dizendo para o assembler criar uma variável (simbolo) chamada BUFFER_SIZE, e atribuá o valor 100 para ela, depois passamos a instrução lcomm que tem um comportamente parecido com a pseudo instrução *data*, porém, enquanto neste as variáveis estáticas precisam ser inicializadas, na sessão bss é apenas reservado o espaço( linux define zero para todo o espaço desse símbolo) de 100 bytes.
 
-### SESSÃO TEXTO
+#### SESSÃO TEXTO
 
-A partir dessa sessão, é onde o texto que representa nosso código ficará armazenado. Vamos criar mais alguns símbolos ( não sei se percebeu, mas estou usando símbolos e variáveis aqui como tendo o mesmo significado) para nos auxiliar na manipulação da stack. Lembre-se que nosso codigo precisa de um ponto de entrada onde a partir dele as instruções começaram a ser executadas, em C definimos esse local como a função main, porém aqui a gente precisa passar uma outra pseudo- instrução que indica onde começaremos, essa é chamada **_start:**
+A partir dessa sessão, é onde o texto que representa nosso código ficará armazenado. Vamos criar mais alguns símbolos ( não sei se percebeu, mas estou usando símbolos e variáveis aqui como tendo o mesmo significado) para nos auxiliar na manipulação da stack. Lembre-se que nosso código precisa de um ponto de entrada onde a partir dele as instruções começaram a ser executadas, em C definimos esse local como a função main, porém aqui a gente precisa passar uma outra pseudo- instrução que indica onde começaremos, essa é chamada **_start:**
 
-Apesar das diferenças de nomeclartura, esse ponto de entrada também funciona como uma função, fazendo com que automaticamente, no espaço de memoria desse processo seja criado uma stack, onde vamos começar a definir e armazenar alguns valores.
+Apesar das diferenças de nomeclartura, esse ponto de entrada "funciona como uma função". Essa informação não esta 100% precisa, pois _start não define um endereço de retorno e nem altera os registradores ESP e EIP como é feito por uma chamada de função, ele é o ponto de entrada no endereço de memoria criado pelo sistema operacional para inciar a execução desse processo, mas deixemos assim por enquanto.
 
     #STACK POSITIONS
 	.equ ST_SIZE_RESERVE, 8
 	.equ ST_FD_IN, -4
 	.equ ST_FD_OUT, -8
 
-Apesar de não estar explicito no exemplo, toda função precisa ser "jogada" na stack par que o fluxo do programa possa permanecer inalterado, ou seja, registrador denominado IP ( instruction pointer) saiba para onde retornar após a execução dessa função, e isso não é diferente na chamada do _start, antes de 
+Apesar de não estar explicito no exemplo, toda função precisa ser "jogada" na stack par que o fluxo do programa possa permanecer inalterado, ou seja, registrador denominado EIP (Extended instruction pointer) saiba para onde retornar após a execução dessa função,  
 
+# Referencias Bibliograficas
 
-
-
-https://www.ibm.com/docs/en/aix/7.1?topic=ops-pseudo-overview
 
 https://www.spiceworks.com/tech/tech-general/articles/risc-vs-cisc/#:~:text=Examples%20of%20RISC%20processors%20include,%2C%20Power%20Architecture%2C%20and%20SPARC.
 
@@ -276,4 +296,3 @@ https://codef00.com/
 
 https://www.ibm.com/docs/en/hla-and-tf/1.6?topic=statements-equ-instruction
 
-https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md
