@@ -1,0 +1,58 @@
+---
+title: Man Help e info
+date: '2024-04-26'
+tags: ['linux',]
+draft: false
+summary: Porque existem três formas e pesquisar informações no linux
+language: pt
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+---
+
+<TOCInline toc={props.toc} asDisclosure toHeading={5} />
+
+# Comandos de Pesquisa
+
+Para ter uma visão geral sobre porquê existem tres formas de pesquisar comandos em sistemas baseados em Unix, precisamos primeiro dar um context histórico.
+
+## Contexto Histórico
+
+Unix é o sistema operacional desenvolvido nos anos 60 desenvolvido com uma filosofia de simplicidade e modularidade em que a criação de programas apantemente triviais combinados tem grande utilidade e um propósito mais geral. Temos abaixo uma citação extraída do wikipedia:
+
+>The Unix philosophy emphasizes building simple, compact, clear, modular, and extensible code that can be easily maintained and repurposed by developers other than its creators. The Unix philosophy favors composability as opposed to monolithic design.
+
+Esse sistema ficou famoso, e com o surgimento da internet e sua grande expansão ficou mundialmente conhecido.
+
+Como os diversos problemas sobre licença e reprodução de software nos anos 80 (que por si só da um outro tópico extenso) Richard Stallam desenvolveu o GNU, que acronimo recursivo que significa "GNU não é Unix" que encabeçou a filosofia do software livre descrita na GLP (General License Public). 
+
+Este é o conjunto de softwares que podem ser usados como um sistema operacional ou que podem ser usados como parte de um. De forma bem simplificada, um sistema operacional é constituido de várias programas que permitem o uso do computador mais o kernel, que seria um programa especial que fornece uma simplificação e abstração para garantir segurança entre diversos sofwares utilizados pelo usuario, e comunicação com o hardware do sistema.
+
+É dessa possibilidade de criação de diversos kernel difernetes que surge o Linix/GNU, um sistema operacional que implementa as ferramentas do projeto GNU e um kernel desenvolvido por Linux Torvalds.
+
+Apesar da intenção de dar um contexto, a historia de sistema operacional abordada aqui é de uma simplicidade enorme, então caso tenha interesse em se aprodundar, google.
+
+## Man x Info
+
+Mas porquê foi preciso dar essa visão geral para falar sobre comandos de pesquisa? Bom, com essa podemos entender que UNIX é o sofware que foi desenvolvido antes, e que o GNU e Linux são de certa fora baseados neles. E com essa informação podemos entender porque além do `man`comando do UNIX sistema que descreve diversos softwares que existem junto com o sistema operacional, também temos o comando `info`, que foi uma criação dos desenvolvedores do GNU para ser uma alternativa ao uso do manual do Unix.Nele conseguimos encontrar todas as informações que encontramos no man, mas a forma de interagir com info aparenta ser um pouco mais amigável, e para aqueles que são familiarizado com o editor de texto 'vi' podem achar diversos atalhos e funcionalidades de navegação e interação bem similares. Secundo a própria descrição do programa `info` ele permiter ler documentos em um formado "Info format".
+
+## Man e Help
+
+Nessa parte é que realmente fica interessante, pois é aqui que muitas vezes podemos nos deparar com a execução do comando man para alguns progrmas e não termos o retorno de nada, talvez mesmo sabendo que tão programa existe. Por exemplo, digite no terminal um desses comandos:
+
+```COMMAND:BASH
+whereis cd 
+whatis cd
+man cd
+```
+
+Percebeu que não houve um retorno da descrição desse programa? Pois bem, não vamos entrar no detalhe de como programa é executado no terminal, mas basicamente o que acontece é que ao inserir um comando no shell, este verifica se é um comando inbutido, uma função shell, um alias ou um executavel,inicia várias chamadas de sistema junto ao sistema operacional (inclusive abrindo outro shell), faz uma pesquisa onde esse executavél pode estar (No linux os binários dos executáveis ficam armazenados na pasta bin, que é um dos diretórios armazenados na string definda como variável de sistema no $PATH) e o encontrando o executa. O comando man procura por manuais nas seções do manual do sistema (geralmente localizadas em diretórios como /usr/share/man). Se o comando é embutido, ele não terá uma página de manual separada.
+
+Ja o comando info não procura por programa no diretório bin, ele pesquisa por funções descritas no código do interpretador shell (embutidos), ou seja, no programa utilizado como interpretador de comando de linha (por exemplo BASH - Bourne again Shell) existi uma função chamada cd que será executada quando no terminal. 
+
+Para visualizar todas as funções descritas no shell, digite apenas o comadando info e ele retornará a lista de todas as funções que utilizamos como comandos.Na verdade ele não so retorna informações sobre os embutidos como sobre os demais programas de forma que poderiamos dizer que ele abrange um maior legue de opções.
+
+No manual do programa BASH ele informa por exemplo, como funciona a chamada da função cd:
+
+>CDPATH The search path for the cd command.  This is a colon-separated list  of
+              directories in which the shell looks for destination directories speci‐
+              fied by the cd command.  A sample value is ".:~:/usr"
+

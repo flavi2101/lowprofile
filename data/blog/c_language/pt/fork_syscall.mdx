@@ -18,7 +18,7 @@ Vamos transcrever o que o manual dessa chamada de sistema diz sobre ela:
 
 >Fork cria um novo processo através da duplicação do processo inicial. O novo processo é descrito como filho e o processo que fez a chamada é definido como pai. O processo filho é uma cópia do pai, possuindo os mesmo valores de registradores e variáveis.
 
-Na documentação descreve que apesar de ser uma cópia, o processo filho tem  PID[^1] diferentes, alguns atributos são reiniciados os valores e algumas area de mémoria não são herdados. Caso queira os detalhes dessas exceções descritas no manual [clique aqui](/lowprofile/data/blog/c_language/pt/excecoes_heranca_fork)
+Na documentação descreve que apesar de ser uma cópia, o processo filho tem  PID[^1] diferentes, alguns atributos são reiniciados os valores e algumas areas de mémoria não são herdados. Caso queira os detalhes dessas exceções descritas no manual [clique aqui](/lowprofile/data/blog/c_language/pt/excecoes_heranca_fork)
 
 [^1]: Identificação do processo 
 
@@ -109,5 +109,13 @@ Esse comando irá nos retornar diversas informações relacionadas a esse proces
 No nosso exemplo iremos dar atenção ao **Pid** e ao **PPid**. O primeiro refere-se a identificação do processo que estamos analisando, no nosso exemplo, o processo yes. Já o PPid refere-se ao processo pai, que no nosso exemplo é a identificação do bash onde foi executado. Podemos fazer essa conferência com os valores de PID que retornaram do nosso comando **ps**. 
 
 Achei pertinente inserir essa informação aqui, pois é importante entender **como** os PIDs estão relacionados ao uso da função fork. Quando esta é chamada, ela retorna o valor zero no processo filho e o __PID do filho__ no processo pai. Esse valor é usado para distinguir entre os dois processos, mas não deve ser confundido com o próprio PID dos processos. Este é um identificador único para cada processo, enquanto o valor retornado pelo fork ajuda a controlar o fluxo de execução entre pai e filho.
+
+## Wait
+
+Não sei se você reparou na saída do nosso exemplo anterior, mas a ordem dos printf não estavam muito coerente com a forma que foram escrito no código. O motivo disso é porque após um processo filho ser criado nós não temos controle de como será a execução dos processos na sistema de agenda do sistema operacional, ou em qual core do CPU será executado ( processador multicore) e qual deles será o primeiro. Além disso um processo tem quatro estado: Ele está sendo executado, esta na fila para execução, esta em espera ou esta finalizado. Baseado nessas condições, precisamos passar para o sistema operacional que queremos que o processo pai aguarde alguma mudança de estado do processo filho para que ele faça algo.
+
+> Além de agendar qual processo vai ser executado o sistema operacional ainda possui algoritimos que auxiliam a priorizar processos de forma a fazê-los "passar na frente" de algum outro que esta na fila.
+
+O manual dessa chamada de sistema nós da uma descrição de que essa operação é sempre realizada no processo pai de forma que ele aguarde a finalização do processo filho, colete informação de processo finalizado para que possa realizar a liberação no kernel dos dados relacionados ao filho. Caso não existá essa relação de ordem de execução, teremos o que o manual descreve como processo zumbi, que é quando o processo filho terminou sua execução, o pai não foi capaz de receber essa informação e dados sobre o filho ainda permanecem armazenados no kernel (PDI, status de terminação, informação de recursos utilizados) consumindo recursos e podendo vir evitar até criação de novos processos naquela região de memória
 
 # Referência 
