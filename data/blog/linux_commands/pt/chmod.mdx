@@ -1,0 +1,198 @@
+---
+title: CHMOD
+date: '2024-06-13'
+tags: [ 'chmod', 'file_mode_bit', 'GNU']
+draft: false
+summary: Como utilizar o programa chmod
+language: pt
+bibliography: 'https://raw.githubusercontent.com/flavi2101/lowprofile/master/data/references-data.bib'
+---
+
+
+O programa disponível no sistma Linux/GNU que permite alteração de permissão em arquivos é o chmod, que é a abreviação para change mode. Apesar de ser um programa simples, ele possuiu várias nuancias que precisam estar claras na hora de utilizar essa ferramenta. A intenção desse post é esclarecer esses detalhes. Lembrando que a melhor fonte para esclarecer essas detalhes e o manual do programa, mesmo com a dificuldade de interpretação que possa surgir.
+
+<TOCInline toc={props.toc} asDisclosure toHeading={5} />
+
+# Introdução
+
+Para entender o que o programa chmod faz em um arquivo precisamos enteder o que são permissões e quem são as pessoas que as possui.
+
+Permissões de arquivos representam configuções que permitem que operações possam ou não ser executadas em arquivos e diretórios. Um arquivo no sistema linux pode ter a configuração permitido ser lido/visualizado (abrir), modificado/criado (escrever)[^1] e ainda pode ser um executável[^2], ou seja, um programa.
+
+[^1]: Sem a permissão de escrever não conseguimos definir permissões. 
+[^2]: Para pastas(diretórios) significa ser pesquisado
+"Pessoas" representam os usuário do sistema que irão interagir com esse arquivo ou diretório. Podemos distinguí-los em quatro categorias: 
+
+- USER
+  - Usuário que criou o arquivo
+
+-GROUP
+  - Como a própria palavra diz, representa um grupo/associação de usuários
+
+- OTHERS
+  - Todos os outros usuários que não fazer parte do grupo
+
+- All
+  - Todos os usuários do sistema
+
+## Notações
+
+Existem duas maneiras de modificar como os bits que representam essas permissões e usuarios, uma sendo a maneira simbólica e a outra utilzando numeros no sistema octagonal/numerico.
+
+## Notação simbólica
+
+```BASH:Create_file
+$ touch fileTest
+$ ls -al fileTest
+ -rw-r--r-- 1 flaviohenr flaviohenr 0 Jun 13 16:13 fileTest 
+$ stat -c %a fileTest 
+ -rw-r--r--
+$ stat -c %a fileTest
+ 644
+$ stat -c %a%A fileTest
+ 644-rw-r--r--
+```
+
+No exemplo acima utilizamos o comando `ls` e o comando `stat` para visualizar quais são as configurações padrões quando um arquivo ou diretório é criado.  [Clique aqui](../pt/umask) para saber como modificá-la.
+
+Nessa imagem podemos ver como estão divido os usuários na descrição de permissão 
+![users_permission](/static/images/posts/permisson_structured.png)
+
+Nessa podemos ver a posição em que existem letras que represetam a autorização para cada usuário. Quando existe apenas um traço indica que não há permissão.
+
+![users_permission_detail](/static/images/posts/permission_file_detail.png)
+
+Da imagem acima podemos concluir que o usuário que criou esse arquivo tem permissão de lê-lo e escrevê-lo mas não ter permissão de executá-lo. Todos os usuários pertencentes ao grupo podem apenas ler. O mesmo é valido para todos os outros usuários do sistema. Lembre-se, essa configuração é especifica para esse arquivo.
+
+### Alterando permissões
+
+Notação:
+
+> chmod ugoa... (+=... wrx...) | (-=... wrx...) file_name [^3]
+
+[^3]: Essa expressão esta utilizando a notação/simbologia do manual para os argumentos do programa.Caso não conheça, [aqui](../../simbologia) tem uma preve explicação. A notação oficial na documentação é diferente da representada aqui. Podemos sim utilizar a simbologia "+ -" em conjunto, porém não faz muito sentido, pois apenas a escrita por último será aplicada.
+
+A expressão acima define como podemos alterar permissões na notação simbólica.
+
+1. Chamamos o programa chmod, responsável por alterar permissões.
+2. Definimos quem será a 'pessoa' que estamos querendo modificar a permissão.<br/>
+   u - usuario <br/>
+   g - grupo <br/>
+   o - outros <br/>
+   a - todos  <br/>
+3. Adicionar ou remover permissão. <br/>
+  w - escrever (write) <br/>
+  r - ler (read) <br/>
+  x - executar (eXecute) <br/>
+4. Nome do arquivo
+
+```BASH:Modificando_autorização
+$ chmod ug=+ wrx fileTest
+chmod: cannot access 'wrx': No such file or director
+
+# como foi inserido um espaço após o sinal de "+",
+# chmod entendeu que wrx era o nome do arquivo, por isso do erro.
+
+$ chmod ug=+wrx fileTest
+-rwxrwx--- 1 flaviohenr flaviohenr 0 Jun 13 16:13 fileTest
+```
+
+## Notação octagonal/Numerica
+
+É chamada de notação octagonal porque o maior valor possivel para alterar um permissão é o valor 7. Porém acredito sem mais simples pensar em termos de sistema binário.
+
+Vimos na segunda imagem desse post que existe um campo relacionado a tipo de arquivo e nove relacionados as permissões, três para cada tipo de usário.Iremos usar essa mesma ideia, mas precisamos primeiro dessacociar com as letras que ocupam determinadas posições na notação simbólica e inserir numeros no lugar delas. Mas um detalhe importante, a posição do numero binário irá influenciar no valor que ele representa no sistema octagonal, e não tem relação nenhuma ler, escrever ou executar. Veja a imagem abaixo.
+
+> ATENÇÃO: ESSA IMAGEM É PARA ENTENDERMOS O CONCEITO, VOCÊ NUNCA CONSEGUIRÁ DEFINIR PERMISSÕES DESSA FORMA OU VISUALIZA.
+
+![permissao_binaria](/static/images/posts/permisson_octagonal.png)
+
+Agora façamos a conversão desses valores para o sistema octagonal
+
+Permissão de usuario
+
+$\color{red}{1} \times \color{gray}{2}^2 + \color{red}{0} \times \color{gray}{2}^1 + \color{red}{1} \times \color{gray}{2}^0 = 5$
+
+Permissão de grupo
+
+$\color{red}{1} \times \color{gray}{2}^2 + \color{red}{1} \times \color{gray}{2}^1 + \color{red}{0} \times \color{gray}{2}^0 = 6$
+
+Permissão de outros
+
+$\color{red}{0} \times \color{gray}{2}^2 + \color{red}{0} \times \color{gray}{2}^1 + \color{red}{0} \times \color{gray}{2}^0 = 0$
+
+Esses valores representam as permissões de um arquivo, se executarmos `stat -c %a nome_arquivo` teriamos como retorno o valor `560`
+
+### Significado dos valores e alterando permissão
+
+Com essa ideia podemos ver os valores de permissão para casa tipo de usuário, agora precisamos entender o que eles siginficam, pois até agora foi possivel visualizar que o valor na casa da centena representa a permissão do usuario, da dezena a do grupo e da unidade a dos outros, mas e a permissão?
+
+Alguns parágrafos acima eu te pedi para dessacociar com as letras que representam as permissões no sistema simbólico certo? Bom, eu prefiro manter uma certa associação porque me ajuda a lembrar os valores base, e com isso consigo associar de maneira simples permissão e valor, mas se voce gosta de decorar informações, aqui esta uma oportunidade.
+
+
+
+
+
+
+  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <thead>
+      <tr>
+        <th style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', border: '1px solid #ddd', padding: '8px' }}>
+          Permissão Simbólica
+        </th>
+        <th style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', border: '1px solid #ddd', padding: '8px' }}>
+          Permissão Numérica
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style={{textAlign:"center"}}>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', padding: '8px', fontSize:'1.5em' }}>
+          _ _ x
+        </td>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', fontSize:'1.5em', padding:'0px' }}>
+          _ _ 1
+        </td>
+      </tr>
+      <tr style={{textAlign:"center"}}>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', fontSize:'1.5em', padding:'0px' }}>
+          _ w _
+        </td>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', fontSize:'1.5em', padding:'0px' }}>
+          _ 2 _
+        </td>
+      </tr>
+        <tr style={{textAlign:"center"}}>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', fontSize:'1.5em', padding:'0px' }}>
+          r _ _
+        </td>
+        <td style={{ textAlign: 'center', fontSize: '1em', border: '1px solid #ddd', fontSize:'1.5em', padding:'0px' }}>
+          4 _ _
+        </td>
+      </tr>    
+      
+    </tbody>
+  </table>
+
+Com base na informação dessa tabela conseguimos relizar qualquer modificação de permissão. Caso queiramos realizar váras em um unico comando basta apenas somar esses valores, da mesma forma que passavamos de forma explicita no sistema simbólico.
+
+```SHELL:octagonal_mode_bit
+$chmod 766 fileTest
+$ls -al fileTest
+-rwxrw-rw- 1 flaviohenr flaviohenr 0 Jun 13 16:13 fileTest
+
+# Para o usuário so conseguimos o numero 7 somando 1+2+4,
+# por isso da permissão de ler, escrever e executar
+
+# Para o grupo so conseguimos o numero 6 somando 2+4,
+# por isso da permissão de ler e escrever 
+
+# Mesmo principio para os outros usuários
+```
+
+## SETUID - SETGID - STICK
+
+Achou que não havia mais nada a ser falado sobre permissões né? Ainda temos esse detalhe. As propriedades descritas aqui são apenas continuidade do que foi dito anteriormente, foram separadas apenas para facilitar o entendimento, pois explicá-las em conjunto poderia deixar um pouco confuso.
+
+
+
