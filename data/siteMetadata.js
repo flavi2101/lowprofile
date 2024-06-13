@@ -11,7 +11,7 @@ const siteMetadata = {
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/avatar.png',
   //mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'flavi2101@gmail.com@gmail.com',
+  email: 'flavi2101@gmail.com',
   github: 'https://github.com/flavi2101',
   linkedin: 'https://www.linkedin.com/in/flavio2101/',
   // mastodon: 'https://mastodon.social/@mastodonuser',
