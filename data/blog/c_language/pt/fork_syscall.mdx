@@ -110,7 +110,7 @@ No nosso exemplo iremos dar atenção ao **Pid** e ao **PPid**. O primeiro refer
 
 Achei pertinente inserir essa informação aqui, pois é importante entender **como** os PIDs estão relacionados ao uso da função fork. Quando esta é chamada, ela retorna o valor zero no processo filho e o __PID do filho__ no processo pai. Esse valor é usado para distinguir entre os dois processos, mas não deve ser confundido com o próprio PID dos processos. Este é um identificador único para cada processo, enquanto o valor retornado pelo fork ajuda a controlar o fluxo de execução entre pai e filho.
 
-{/* ## Wait
+## Wait
 
 Não sei se você reparou na saída do nosso exemplo anterior, mas a ordem dos printf não estavam muito coerente com a forma que foram escrito no código. O motivo disso é porque após um processo filho ser criado nós não temos controle de como será a execução dos processos na sistema de agenda do sistema operacional, ou em qual core do CPU será executado ( processador multicore) e qual deles será o primeiro. Além disso um processo tem quatro estado: Ele está sendo executado, esta na fila para execução, esta em espera ou esta finalizado. Baseado nessas condições, precisamos passar para o sistema operacional que queremos que o processo pai aguarde alguma mudança de estado do processo filho para que ele faça algo.
 
@@ -118,4 +118,4 @@ Não sei se você reparou na saída do nosso exemplo anterior, mas a ordem dos p
 
 O manual dessa chamada de sistema nós da uma descrição de que essa operação é sempre realizada no processo pai de forma que ele aguarde a finalização do processo filho, colete informação de processo finalizado para que possa realizar a liberação no kernel dos dados relacionados ao filho. Caso não existá essa relação de ordem de execução, teremos o que o manual descreve como processo zumbi, que é quando o processo filho terminou sua execução, o pai não foi capaz de receber essa informação e dados sobre o filho ainda permanecem armazenados no kernel (PDI, status de terminação, informação de recursos utilizados) consumindo recursos e podendo vir evitar até criação de novos processos naquela região de memória
 
-# Referência  */}
+# Referência 

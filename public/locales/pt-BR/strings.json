@@ -24,10 +24,10 @@
     "desc": "Criado utilizando Nest Js e Tailwind",
     "view_source": "Código fonte"
   },
-  "oc_title": "自设",
+  "oc_title": "string.json",
 
   "Latest": "Recentes",
-  "All Posts": "所有文章",
-  "img_overlay_hint": "长按拖动。滚动缩放。",
-  "img_overlay_hint_mobile": "长按拖动。双指缩放。"
+  "All Posts": "strings.json",
+  "img_overlay_hint": "strings.json",
+  "img_overlay_hint_mobile": "strings.json"
 }

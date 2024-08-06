@@ -101,9 +101,9 @@ $ chmod ug=+wrx fileTest
 
 É chamada de notação octagonal porque o maior valor possivel para alterar um permissão é o valor 7. Porém acredito sem mais simples pensar em termos de sistema binário.
 
-Vimos na segunda imagem desse post que existe um campo relacionado a tipo de arquivo e nove relacionados as permissões, três para cada tipo de usário.Iremos usar essa mesma ideia, mas precisamos primeiro dessacociar com as letras que ocupam determinadas posições na notação simbólica e inserir numeros no lugar delas. Mas um detalhe importante, a posição do numero binário irá influenciar no valor que ele representa no sistema octagonal, e não tem relação nenhuma ler, escrever ou executar. Veja a imagem abaixo.
+Vimos na segunda imagem desse post que existe um campo relacionado a tipo de arquivo e nove relacionados as permissões, três para cada tipo de usário.Iremos usar essa mesma ideia, mas precisamos primeiro dessacociar com as letras que ocupam determinadas posições na notação simbólica e inserir numeros no lugar delas. Mas um detalhe importante, a posição do numero binário irá influenciar no valor que ele representa no sistema octagonal, e não tem relação nenhuma com ler, escrever ou executar da notação simbólica. Veja a imagem abaixo.
 
-> ATENÇÃO: ESSA IMAGEM É PARA ENTENDERMOS O CONCEITO, VOCÊ NUNCA CONSEGUIRÁ DEFINIR PERMISSÕES DESSA FORMA OU VISUALIZA.
+> ATENÇÃO: ESSA IMAGEM É PARA ENTENDERMOS O CONCEITO, VOCÊ NUNCA CONSEGUIRÁ DEFINIR PERMISSÕES DESSA FORMA OU VISUALIZÁ-LA.
 
 ![permissao_binaria](/static/images/posts/permisson_octagonal.png)
 
@@ -121,7 +121,7 @@ Permissão de outros
 
 $\color{red}{0} \times \color{gray}{2}^2 + \color{red}{0} \times \color{gray}{2}^1 + \color{red}{0} \times \color{gray}{2}^0 = 0$
 
-Esses valores representam as permissões de um arquivo, se executarmos `stat -c %a nome_arquivo` teriamos como retorno o valor `560`
+Esses valores representam as permissões de um arquivo, se executarmos `stat -c %a <nome_arquivo>` teriamos como retorno o valor `560`
 
 ### Significado dos valores e alterando permissão
 
@@ -174,7 +174,7 @@ Alguns parágrafos acima eu te pedi para dessacociar com as letras que represent
     </tbody>
   </table>
 
-Com base na informação dessa tabela conseguimos relizar qualquer modificação de permissão. Caso queiramos realizar váras em um unico comando basta apenas somar esses valores, da mesma forma que passavamos de forma explicita no sistema simbólico.
+Com base na informação dessa tabela conseguimos relizar qualquer modificação de permissão. Caso queiramos realizar várias em um único comando basta apenas somar esses valores, da mesma forma que passavamos de forma explicita no sistema simbólico.
 
 ```SHELL:octagonal_mode_bit
 $chmod 766 fileTest
@@ -194,5 +194,123 @@ $ls -al fileTest
 
 Achou que não havia mais nada a ser falado sobre permissões né? Ainda temos esse detalhe. As propriedades descritas aqui são apenas continuidade do que foi dito anteriormente, foram separadas apenas para facilitar o entendimento, pois explicá-las em conjunto poderia deixar um pouco confuso.
 
+### STICK bits
+
+Essa flag é utilizada para definir se o arquivo ou diretório pode ser deletado por algum outro usuário sem ser o dono do arquivo. Mesmo que voce passe no modo simboligo que outros, grupo ou todos os usuários possam ter essa flag, ela so será válida para o dono do arquivo ou diretório. Para ativá-la no modo simbolico usamos:
+
+`chmod +t <nome_do_arquivo>`
+
+```SHELL:stick_bit
+
+$ chmod a-wxr+t teste 
+
+# O comando acima remove de todos os usuarios a permissão de escrever, executar e ler. Ainda adiciona a permissão de excluir apenas para o dono do arquivo.
+
+$ ls -l
+total 0
+---------T 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+```
+
+Percebeu que a flag do stick bit ficou na mesma posição que a flag de execução de outros usuarios? Como saberemos se a flag de execução esta ativa ou não?
+
+Se for um T maiúsculo quer dizer que a flag de execução não esta ativa, caso seja um 't' minúsculo quer dizer que a permissão de execução esta ativa.
+
+```SHELL:simbolico
+
+$ chmod o+tx teste 
+
+$ ls -l
+total 0
+---------t 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+```
+
+Para escrever o stick_bit no modo octagonal, adicionamos mais uma casa na notação ( antes haviamos valores representando cada tipo de usuário), agora teremos mais uma casa em que o valor representára o stick_bit, setuid e/ou setgid.
+
+|valor| BIT|
+|---|----------|
+|1  | STICK BIT|
+|2  | GROUPO BIT|
+|4  | USUARIO BIT|
+
+```SHELL:octagonal_mode_bit
+
+$ chmod 1000 teste 
+
+$ ls -l
+total 0
+---------T 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+```
+
+
+
+### SETUID e SETGID
+
+Essas duas flags são utilzadas para permitir que alguem que não seja o usuário dono do arquivo ou não pertence ao grupo ao qual esse arquivo esta associado ainda sim possa executá-lo. Com isso é possivel permitir que certos arquvivos sejam executados sem a necessidade de dar permissões de superusuário por exemplo. Veja por a permissão do executavél `passwd`:
+
+`ls -l /usr/bin/passwd`
+
+Perceba que temos como retorno:
+
+`-rwsr-xr-x 1 root root 72344 Feb  4 17:28 /usr/bin/passwd`
+
+O usuário dono desse arquivo é o root, e o grupo também é o root, mas mesmo assim você com seu usuário consegue alterar o seu password, isso se da por conta da flag 's' para o grupo de usuário, permitindo que qualuqer usário possa executar esse arquivo.
+
+Um detalhe semelhante ao que vimos com o stick bit é o uso de letra maiúscula quando a permissão de executar não esta ativa e o uso de letra minuúscula quando este esta ativo. 
+
+Para habilitar ou desabilitar essa funcionalidade, agora é a letra 's' que os representa, e devemos definir se será para os usuários ou para o grupo.
+
+```SIMBOLICO:set_ug_bit
+
+# usuario com setuid ativo
+
+$ chmod u+s teste 
+$ ls -l
+total 0
+---S------ 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+# usuario e grupo ativos -setuid e setgid
+
+$ chmod ug+s teste 
+$ ls -l
+total 0
+---S--S--- 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+# Adicionando flag de executavel
+
+$ chmod ug+sx teste 
+$ ls -l
+total 0
+---s--s--- 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+```
+
+```SHELL:Octagonal_set_bit
+
+# Adicionando setuid
+
+$ chmod 4000 teste
+$ ls -l
+total 0
+---S------ 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+# Adicionado setgid
+
+chmod 2000 teste
+$ ls -l
+total 0
+------S--- 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+# Adicionando setgid, setuid, stick_bit, executavel para o usuario
+# 7 -> 1 - setuid | 2 - setgid | 4 - stick bit
+# 1 -> executavel para o users_permission
+# 0 -> nenhuma flag foi ativada para o grupo
+# 0 -> nenhuma flag foi ativada para outros
+
+$ chmod 7100 teste
+$ ls -l
+total 0
+---s--S--T 1 flaviohenr flaviohenr 0 Jun 20 16:31 teste
+
+```
 
 
